@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 const WebSocket = require("ws");
+const Submission = require("./models/submission");
 
 // Create an Express app
 const app = express();
@@ -47,27 +48,13 @@ app.use(express.json()); // To parse incoming JSON requests
 
 // MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected...");
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);
   });
-
-// Define the User schema and model
-const submissionSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  dob: { type: Date, required: true },
-  department: { type: String, required: true },
-  comments: { type: String, optional: true },
-});
-
-const Submission = mongoose.model("User", submissionSchema);
 
 // Routes
 
