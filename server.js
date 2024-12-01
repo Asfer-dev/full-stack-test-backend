@@ -75,6 +75,18 @@ const Submission = mongoose.model("User", submissionSchema);
 app.post("/api/submission/add", async (req, res) => {
   try {
     const { name, email, dob, department, comments } = req.body;
+
+    if (!name || !email || !dob || !department) {
+      return res
+        .status(400)
+        .json({ message: "All required fields must be filled." });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format." });
+    }
+
     const newSubmission = new Submission({
       name,
       email,
@@ -121,6 +133,17 @@ app.post("/api/submission/update", async (req, res) => {
   try {
     const { _id, name, email, dob, department, comments } = req.body;
     const submission = await Submission.findById(_id);
+
+    if (!name || !email || !dob || !department) {
+      return res
+        .status(400)
+        .json({ message: "All required fields must be filled." });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format." });
+    }
 
     submission.name = name;
     submission.email = email;
