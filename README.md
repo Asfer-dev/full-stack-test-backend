@@ -33,7 +33,6 @@ cd your-repo-name
 Install the required dependencies:
 
 ```bash
-Copy code
 npm install
 ```
 
@@ -51,7 +50,6 @@ PORT=5000
 Start the server:
 
 ```bash
-Copy code
 npm start
 ```
 
