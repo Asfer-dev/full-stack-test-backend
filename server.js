@@ -94,7 +94,7 @@ app.post("/api/submission/add", async (req, res) => {
 // Get all Submissions
 app.get("/api/submission", async (req, res) => {
   try {
-    const submissions = await Submission.find();
+    const submissions = await Submission.find().sort({ createdAt: -1 });
 
     res.status(200).json(submissions);
   } catch (err) {
