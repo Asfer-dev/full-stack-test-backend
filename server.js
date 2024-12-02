@@ -1,50 +1,25 @@
-// server.js
-
-// Required modules
 const express = require("express");
-const http = require("http");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
-const WebSocket = require("ws");
 const Submission = require("./models/submission");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
 
-// Create an Express app
 const app = express();
-const PORT = process.env.PORT || 5000;
-
-const server = http.createServer(app);
-
-// Set up WebSocket server
-const wss = new WebSocket.Server({ server });
-
-// Broadcast function: sends messages to all connected clients
-function broadcastMessage(message) {
-  wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(message);
-    }
-  });
-}
-
-// When a client connects to WebSocket
-wss.on("connection", (ws) => {
-  console.log("A new WebSocket connection has been made");
-
-  // Listen for messages from the client
-  ws.on("message", (message) => {
-    console.log("Received message:", message);
-    // Broadcast the received message to all clients
-    broadcastMessage(message);
-  });
-
-  // Send a welcome message when a client connects
-  ws.send("Connected to WebSocket server");
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
 });
+
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
-app.use(express.json()); // To parse incoming JSON requests
+app.use(express.json());
 
 // MongoDB connection
 mongoose
@@ -83,7 +58,7 @@ app.post("/api/submission/add", async (req, res) => {
     });
 
     await newSubmission.save();
-    broadcastMessage(JSON.stringify(newSubmission));
+    io.emit("new_submission", newSubmission);
     res.status(201).json(newSubmission);
   } catch (err) {
     console.log(err);
@@ -161,6 +136,6 @@ app.delete("/api/submission/:subid", async (req, res) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
